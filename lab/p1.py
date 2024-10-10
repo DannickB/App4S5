@@ -24,7 +24,6 @@ plt.plot(w, hdb)
 plt.savefig("P1_c.png")
 #d)
 z = np.arange(1000)
-Hz = (z-z1)*(z-z2)/((z-p1)*(z-p2))
 d = np.zeros(len(z))
 d[int(len(z)/2)] = 1
 hn = signal.lfilter(b, a, d)
