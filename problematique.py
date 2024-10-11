@@ -27,6 +27,12 @@ p4 = 0.95*np.exp(-1j*np.pi/8)
 b = np.poly([z1, z2, z3, z4])
 a = np.poly([p1, p2, p3, p4])
 
+#filtering image
+img_clean = signal.lfilter(b, a, img_aberration)
+plt.figure("Image sans aberration")
+plt.title("Image sans aberration")
+plt.imshow(img_clean)
+
 #zero et poles
 plt.figure("Pz map H(z)")
 plt.title("Pz map H(z)")
@@ -35,10 +41,6 @@ plt.figure("Pz map H(z) inverse")
 plt.title("Pz map H(z) inverse")
 z, p, k = zplane(b, a)
 
-#filtering image
-img_clean = signal.lfilter(b, a, img_aberration)
-plt.figure("Image cleaned")
-plt.title("Image cleaned")
-plt.imshow(img_clean)
+
 
 plt.show()
