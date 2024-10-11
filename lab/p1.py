@@ -34,5 +34,8 @@ plt.plot(20*np.log10(hm[0:int(len(z)/2)]))
 hn2 = signal.lfilter(a, b, hn)
 plt.figure("2eme filtre")
 plt.plot(hn2)
+
+
+
 plt.show()
 pass

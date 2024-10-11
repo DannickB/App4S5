@@ -41,6 +41,24 @@ plt.figure("Pz map H(z) inverse")
 plt.title("Pz map H(z) inverse")
 z, p, k = zplane(b, a)
 
+#Rotation
+M = np.array([[0, 1], [-1, 0]])
+plt.gray()
+img = mpimg.imread('img/goldhill_rotate.png')
+plt.figure("Image sans rotation")
+plt.title("Image sans rotation")
+plt.imshow(img)
+img_rotated = np.zeros([img.shape[0], img.shape[1]])
+for x in range(img.shape[0]):
+    for y in range(img.shape[0]):
+        coords = np.array([x, y])
+        coords.transpose()
+        new_coords = np.matmul(M,coords)
+        new_coords.transpose()
+        img_rotated[new_coords[0]][new_coords[1]] = img[x][y][0]
+plt.figure("Image avec rotation")
+plt.title("Image avec rotation")
+plt.imshow(img_rotated)
 
 
 plt.show()
