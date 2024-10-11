@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 from zplane import zplane
-aberration_path = "./img/goldhill_aberrations.npy"
+img_path = "./img/image_complete.npy"
 
 #Image reading
 
-img_aberration = np.load(aberration_path)
+img_aberration = np.load(img_path)
 plt.figure("Aberration")
 plt.gray()
 plt.title("Image avec aberration")
@@ -28,10 +28,10 @@ b = np.poly([z1, z2, z3, z4])
 a = np.poly([p1, p2, p3, p4])
 
 #filtering image
-img_clean = signal.lfilter(b, a, img_aberration)
+img_rotation = signal.lfilter(b, a, img_aberration)
 plt.figure("Image sans aberration")
 plt.title("Image sans aberration")
-plt.imshow(img_clean)
+plt.imshow(img_rotation)
 
 #zero et poles
 plt.figure("Pz map H(z)")
@@ -44,21 +44,21 @@ z, p, k = zplane(b, a)
 #Rotation
 M = np.array([[0, 1], [-1, 0]])
 plt.gray()
-img = mpimg.imread('img/goldhill_rotate.png')
+# img = mpimg.imread('img/goldhill_rotate.png')
 plt.figure("Image sans rotation")
 plt.title("Image sans rotation")
-plt.imshow(img)
-img_rotated = np.zeros([img.shape[0], img.shape[1]])
-for x in range(img.shape[0]):
-    for y in range(img.shape[0]):
+plt.imshow(img_rotation)
+img_noise = np.zeros([img_rotation.shape[0], img_rotation.shape[1]])
+for x in range(img_rotation.shape[0]):
+    for y in range(img_rotation.shape[0]):
         coords = np.array([x, y])
         coords.transpose()
         new_coords = np.matmul(M,coords)
         new_coords.transpose()
-        img_rotated[new_coords[0]][new_coords[1]] = img[x][y][0]
+        img_noise[new_coords[0]][new_coords[1]] = img_rotation[x][y]
 plt.figure("Image avec rotation")
 plt.title("Image avec rotation")
-plt.imshow(img_rotated)
-
+plt.imshow(img_noise)
+#Filtre du bruit
 
 plt.show()
