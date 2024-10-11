@@ -59,6 +59,36 @@ for x in range(img_rotation.shape[0]):
 plt.figure("Image avec rotation")
 plt.title("Image avec rotation")
 plt.imshow(img_noise)
+
 #Filtre du bruit
+fe = 1600
+f = 500
+f2 = 750
+Nb, wn_b = signal.buttord(wp=f, ws=f2, gpass=0.2, gstop=60, fs=fe)
+Nc1, wn_c1 = signal.cheb1ord(wp=f, ws=f2, gpass=0.2, gstop=60, fs=fe)
+Nc2, wn_c2 = signal.cheb2ord(wp=f, ws=f2, gpass=0.2, gstop=60, fs=fe)
+Ne, wn_e = signal.ellipord(wp=f, ws=f2, gpass=0.2, gstop=60, fs=fe)
+print("Butterworth filter order: " + str(Nb))
+print("Chebyshev type I filter order: " + str(Nc1))
+print("Chebyshev type 2 filter order: " + str(Nc2))
+print("Elliptique filter order: " + str(Ne))
+b, a = signal.ellip(N=Nb, rp=0.2, rs=60, Wn=wn_b, fs=fe)
+w, h = signal.freqz(b, a)
+
+img_encode = signal.lfilter(b, a, img_noise)
+plt.figure("Image sans noise")
+plt.title("Image sans noise")
+plt.imshow(img_encode)
+plt.figure("Hw")
+plt.title("H(w)")
+hdb = 20*np.log10(abs(h))
+plt.plot(w, hdb)
+plt.figure("Phase")
+plt.title("Phase")
+plt.plot(w, np.unwrap(np.angle(h)))
+plt.figure("Zero/pole")
+plt.title("Zero/pole")
+z, p, k = zplane(b, a)
+
 
 plt.show()
