@@ -1,4 +1,7 @@
-import matplotlib.image as mpimg
+#######################
+# bild2707
+# labg0902
+#######################
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
@@ -42,18 +45,16 @@ plt.title("Pz map H(z) inverse")
 z, p, k = zplane(b, a)
 
 #Rotation
-M = np.array([[0, 1], [-1, 0]])
-plt.gray()
-# img = mpimg.imread('img/goldhill_rotate.png')
 plt.figure("Image sans rotation")
 plt.title("Image sans rotation")
 plt.imshow(img_rotation)
+M = np.array([[0, 1], [-1, 0]]) #Matrice de rotation
 img_noise = np.zeros([img_rotation.shape[0], img_rotation.shape[1]])
 for x in range(img_rotation.shape[0]):
     for y in range(img_rotation.shape[0]):
-        coords = np.array([x, y])
-        coords.transpose()
-        new_coords = np.matmul(M,coords)
+        coords = np.array([x, y]) #Matrice de coordonnées
+        coords = coords.transpose() #Transposer la matrice dans le bon sens
+        new_coords = np.matmul(M,coords) #Nouvelles coordonnées avec la matrice de rotation
         new_coords.transpose()
         img_noise[new_coords[0]][new_coords[1]] = img_rotation[x][y]
 plt.figure("Image avec rotation")
@@ -61,9 +62,11 @@ plt.title("Image avec rotation")
 plt.imshow(img_noise)
 
 #Filtre du bruit
+
 fe = 1600
 f = 500
 f2 = 750
+
 Nb, wn_b = signal.buttord(wp=f, ws=f2, gpass=0.2, gstop=60, fs=fe)
 Nc1, wn_c1 = signal.cheb1ord(wp=f, ws=f2, gpass=0.2, gstop=60, fs=fe)
 Nc2, wn_c2 = signal.cheb2ord(wp=f, ws=f2, gpass=0.2, gstop=60, fs=fe)
@@ -72,23 +75,50 @@ print("Butterworth filter order: " + str(Nb))
 print("Chebyshev type I filter order: " + str(Nc1))
 print("Chebyshev type 2 filter order: " + str(Nc2))
 print("Elliptique filter order: " + str(Ne))
-b, a = signal.ellip(N=Nb, rp=0.2, rs=60, Wn=wn_b, fs=fe)
-w, h = signal.freqz(b, a)
-
+b, a = signal.ellip(Ne, 0.2, 60, wn_e, fs=fe, btype='low')
+w, h = signal.freqz(b, a, fs=fe)
 img_encode = signal.lfilter(b, a, img_noise)
 plt.figure("Image sans noise")
 plt.title("Image sans noise")
 plt.imshow(img_encode)
-plt.figure("Hw")
-plt.title("H(w)")
+plt.figure("Hz")
+plt.title("Réponse en fréquence du filtre")
 hdb = 20*np.log10(abs(h))
 plt.plot(w, hdb)
-plt.figure("Phase")
-plt.title("Phase")
-plt.plot(w, np.unwrap(np.angle(h)))
+# plt.figure("Phase")
+# plt.title("Phase")
+# plt.plot(w, np.unwrap(np.angle(h)))
 plt.figure("Zero/pole")
 plt.title("Zero/pole")
 z, p, k = zplane(b, a)
 
+#compression
+cov = np.cov(img_encode)
+s, v = np.linalg.eig(cov)
+v = [v for _, v in sorted(zip(s, v), reverse=True)]
+v = np.array(v)
+v = v.transpose()
+s = sorted(s, reverse=True)
+img_decode = np.matmul(v, img_encode)
+#image avec 50% de perte
+img_50 = np.zeros_like(img_decode)
+img_50[0:int(len(img_decode)/2)] = img_decode[0:int(len(img_decode)/2)]
+#image avec 70% de perte
+img_70 = np.zeros_like(img_decode)
+img_70[0:int(len(img_decode)*0.3)] = img_decode[0:int(len(img_decode)*0.3)]
+
+#recomposition
+v_inv = np.linalg.inv(v)
+img_50_final = np.matmul(v_inv, img_50)
+img_70_final = np.matmul(v_inv, img_70)
+
+plt.figure("Image final 50%")
+plt.title("Image final 50%")
+plt.imshow(img_50_final)
+plt.figure("Image final 70%")
+plt.title("Image final 70%")
+plt.imshow(img_70_final)
+
 
 plt.show()
+pass
