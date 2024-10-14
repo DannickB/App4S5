@@ -61,7 +61,7 @@ plt.figure("Image avec rotation")
 plt.title("Image avec rotation")
 plt.imshow(img_noise)
 
-#Filtre du bruit
+#Filtre du bruit (Par python)
 
 fe = 1600
 f = 500
@@ -82,7 +82,7 @@ plt.figure("Image sans noise")
 plt.title("Image sans noise")
 plt.imshow(img_encode)
 plt.figure("Hz")
-plt.title("Réponse en fréquence du filtre")
+plt.title("Réponse en fréquence du filtre créé avec Python")
 hdb = 20*np.log10(abs(h))
 plt.plot(w, hdb)
 # plt.figure("Phase")
@@ -92,7 +92,28 @@ plt.figure("Zero/pole")
 plt.title("Zero/pole")
 z, p, k = zplane(b, a)
 
-#compression
+# Filtre du bruit (mathematiquement)
+
+num = (np.roots([8.959/18.425, 17.919/18.425, 8.959/18.425]))
+den = (np.roots([1, -3.013/18.425, 4.493/18.425]))
+a = np.poly(den)
+b = np.poly(num)
+f, h = signal.freqz(b, a, fs=fe)
+hdb = 20 * np.log10(np.abs(h))
+
+img_encode = signal.lfilter(b, a, img_noise)
+plt.figure("Image sand noise (math)")
+plt.title("Image sans noise (math)")
+plt.imshow(img_encode)
+plt.figure("")
+plt.plot(f, hdb)
+plt.title("Réponse en fréquence du filtre calculé mathématiquement")
+plt.xlabel("Frequence (Hz)")
+plt.ylabel("Amplitude (dB)")
+z, p, k = zplane(b, a)
+
+# Compression
+
 cov = np.cov(img_encode)
 s, v = np.linalg.eig(cov)
 v = [v for _, v in sorted(zip(s, v), reverse=True)]
@@ -107,7 +128,8 @@ img_50[0:int(len(img_decode)/2)] = img_decode[0:int(len(img_decode)/2)]
 img_70 = np.zeros_like(img_decode)
 img_70[0:int(len(img_decode)*0.3)] = img_decode[0:int(len(img_decode)*0.3)]
 
-#recomposition
+#Recomposition
+
 v_inv = np.linalg.inv(v)
 img_50_final = np.matmul(v_inv, img_50)
 img_70_final = np.matmul(v_inv, img_70)
