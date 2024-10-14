@@ -110,6 +110,8 @@ plt.plot(f, hdb)
 plt.title("Réponse en fréquence du filtre calculé mathématiquement")
 plt.xlabel("Frequence (Hz)")
 plt.ylabel("Amplitude (dB)")
+plt.figure("Zero/Pole (math)")
+plt.title("Zero/Pole (math)")
 z, p, k = zplane(b, a)
 
 # Compression
